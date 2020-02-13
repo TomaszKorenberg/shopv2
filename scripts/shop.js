@@ -1,5 +1,4 @@
 import Api from "./api.js";
-
 const api = new Api();
 
 
@@ -7,6 +6,7 @@ class Shop {
 
     constructor() {
         this.cart = [];
+
     }
 
     buyAndReloadElement(data){
@@ -18,8 +18,7 @@ class Shop {
         }
         api.buy(data._id, {count: document.querySelector("#add-to-cart-input" + data._id).value})
             .then(res => reload(res.result.id))
-        //console.log(data);
-        //return this.reload
+
     }
 
     itemsInCartShowing(cart) {
@@ -45,13 +44,21 @@ class Shop {
 
     findProductIndexInCart(data, cart) {
         this.productIndex = cart.findIndex(el => el.id === data._id)
-        //console.log(this.productIndex)
         return this.productIndex
     }
 
 
     addToCart(data) {
-        if (this.isProductInCart(data, this.cart) === false) {
+        if (data.data.count <= 0){
+            //FIXME: Jeżeli jest jeden produkt i klikniemu kup 2 lub klikniemy 2x kup to wchodzi naminus
+
+            console.log("Nie ma wiecej tego produktu!")
+            console.log("")
+            console.log(document.querySelector("#product-"+data._id+"-count-div"))
+            //TODO: Wywietlic modal z informacją o braku produktu
+        }
+
+        else if (this.isProductInCart(data, this.cart) === false) {
             this.cart.push({
                 id: data._id,
                 count: document.querySelector("#add-to-cart-input" + data._id).value
@@ -155,7 +162,6 @@ class Shop {
     }
 
     /**
-     *
      * @returns add to cart <button>
      */
     addToCartButtonBuilder(data) {
@@ -163,9 +169,9 @@ class Shop {
         this.addToCartButton = document.createElement("button");
         this.addToCartButton.innerText = "Dodaj do koszyka";
         this.addToCartButton.className = "add-to-cart-button";
-        this.addToCartButton.addEventListener("click", function () {
+        this.addToCartButton.addEventListener("click", () => {
             this.addToCart(data)
-        }.bind(this))
+        })
         return this.addToCartButton
     }
 
@@ -190,6 +196,7 @@ class Shop {
         this.allProductsDiv = "";
         this.allProductsDiv = document.querySelector("#all-products");
         for (let i = 0; i < data.length; i++) {
+            //TODO: Jeżeli produkt jest <= 0 to nie wyswietlaj
             this.product = this.productDivBuilder(data[i]);
             this.product.id = "product-" + data[i]._id;
             this.product.className = "product-div";
@@ -198,5 +205,6 @@ class Shop {
     }
 
 }
-const shop = new Shop()
 export default Shop;
+
+
